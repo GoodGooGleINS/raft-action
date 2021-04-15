@@ -108,7 +108,7 @@ the deployment. You can create the secret via the azure portal on your AAD RAFT 
 Place the secret value into the github secret store
 and reference it using `${{ secrets.MYSECRETVALUE }}` where `MYSECRETVALUE` is the name of your secret.
 
-### Running RAFT on the workflow VM
+### Running RAFT within the Github Actions Runner
 
 Here is an example of the RAFT action where a job definition file has been
 checked in at `raft-fuzz/run.json`
@@ -171,3 +171,49 @@ of the tools.
             name: tool-logs
             path: .raft
 ```
+
+### Example Job Definition file
+
+The RAFT project has many [samples](https://github.com/microsoft/rest-api-fuzz-testing/tree/main/cli/samples)
+of job definition files. 
+
+Here is a simple example that runs RESTler and ZAP in parallel 
+against the deployed petstore sample service.
+
+```
+{
+  "testTasks": {
+    "targetConfiguration": {
+      "apiSpecifications": [ "https://petstore.swagger.io/v2/swagger.json" ],
+      "endpoint": "https://petstore.swagger.io"
+    },
+    "tasks": [
+      {
+        "toolName": "RESTler",
+        "outputFolder": "restler-logs",
+        "toolConfiguration": {
+          "tasks": [
+            {
+              "task": "compile"
+            },
+            {
+              "task": "Fuzz",
+              "runConfiguration": {
+                "Duration": "00:10:00"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "toolName": "ZAP",
+        "outputFolder": "zap-logs"
+      }
+    ]
+  }
+}
+```
+
+See the [RAFT documentation](https://github.com/microsoft/rest-api-fuzz-testing/tree/main/cli/samples/restler/self-contained) 
+for examples on how to use RAFT to both deploy and test
+your service in the same job. 
