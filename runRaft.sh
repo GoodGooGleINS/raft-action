@@ -28,5 +28,6 @@ then
   python "$actionPath"/raft.py  --defaults-context-json "$raftDefaults" --secret "$secret" $arguments
 else
   echo "Running RAFT locally"
+  export RAFT_LOCAL="raft-action"
   python "$actionPath"/raft_local.py $arguments   
 fi
