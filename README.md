@@ -7,15 +7,15 @@ for more details.
 
 Tools currently supported by RAFT are:
 * [RESTler](https://github.com/microsoft/restler-fuzzer)
-* [ZAP](https://github.com/zaproxy/zaproxy)
-* [dredd](https://github.com/apiaryio/dredd)
-* [schemathesis](https://github.com/schemathesis/schemathesis)
+* [ZAP](https://github.com/zaproxy/zaproxy) (not available in `local` mode)
+* [dredd](https://github.com/apiaryio/dredd) (not available in `local` mode)
+* [schemathesis](https://github.com/schemathesis/schemathesis) (not available in `local` mode)
 
 ### Action inputs
 ```
 inputs:
   mode:
-    description: 'Setting the mode to azure will deploy against your azure RAFT deployment'
+    description: 'Setting the mode to "azure" will deploy against your azure RAFT deployment'
     required: false
     default: local
   arguments :
@@ -35,15 +35,22 @@ inputs:
 
 ### Action Requirements and Limitations
 
-Jobs are limited to 6 hours.
+* [RESTler](https://github.com/microsoft/restler-fuzzer) is the only supported tool when running in `local` mode.
+To use other tools in your job definition, use the `azure` mode.
 
-For this action to work you will need to setup python. Include the following in your workflow before the raft-action.
-```
-- name: Setup Python
-  uses: actions/setup-python@v2
-  with:
-    python-version: '3.8'    
-```
+* Jobs are limited to 6 hours (this is a github limitation), if you want to fuzz for longer periods of time you will need
+to use your azure deployment of RAFT.
+
+* For this action to work you will need to setup python. Include the following in your workflow before the raft-action.
+  ```
+  - name: Setup Python
+    uses: actions/setup-python@v2
+    with:
+      python-version: '3.8'    
+  ```
+
+* Authentication is not currently supported in `local` mode. If your service APIs are authenticated, use `azure` mode.
+Support for authentication in `local` mode is planned.
 
 ### Available versions
 
@@ -177,7 +184,7 @@ of the tools.
 The RAFT project has many [samples](https://github.com/microsoft/rest-api-fuzz-testing/tree/main/cli/samples)
 of job definition files. 
 
-Here is a simple example that runs RESTler and ZAP in parallel 
+Here is a simple example that runs RESTler 
 against the deployed petstore sample service.
 
 ```
@@ -204,10 +211,6 @@ against the deployed petstore sample service.
             }
           ]
         }
-      },
-      {
-        "toolName": "ZAP",
-        "outputFolder": "zap-logs"
       }
     ]
   }
